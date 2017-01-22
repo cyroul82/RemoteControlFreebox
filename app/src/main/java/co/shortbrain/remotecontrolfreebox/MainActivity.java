@@ -4,8 +4,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -22,7 +26,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-
     private static final String HOME = "home";
     private static final String MUTE = "mute";
     private static final String VOLUME_UP = "vol_inc";
@@ -49,10 +52,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String RED = "red";
     private static final String BLUE = "blue";
     private static final String GREEN = "green";
-
-
-    private String URL_FREE = "http://hd1.freebox.fr/pub/remote_control?code=67277440&key=";
-
     @BindView(R.id.imageViewVolInc)
     ImageView imageViewVolInc;
     @BindView(R.id.imageViewVolDec)
@@ -115,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageView imageViewPause;
     @BindView(R.id.imageViewRecord)
     ImageView imageViewRecord;
-
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private String URL_FREE = "http://hd1.freebox.fr/pub/remote_control?code=67277440&key=";
     private OkHttpClient client = new OkHttpClient();
 
 
@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.free_remote);
 
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         ButterKnife.bind(this);
         imageViewVolInc.setOnClickListener(this);
@@ -157,6 +159,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageViewPlay.setOnClickListener(this);
         imageViewRecord.setOnClickListener(this);
         imageViewPower.setOnClickListener(this);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("app_open", "app_open");
+
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
+
+        mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
 
     }
 
@@ -250,6 +259,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
     private class OkHttpHandler extends AsyncTask<String, Void, Void> {
 
