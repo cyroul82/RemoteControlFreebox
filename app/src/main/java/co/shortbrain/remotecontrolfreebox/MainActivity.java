@@ -23,7 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String HOME = "home";
@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String RED = "red";
     private static final String BLUE = "blue";
     private static final String GREEN = "green";
+    private static final String RECORD = "rec";
+    private static final String BACKWARD = "bwd";
+    private static final String FORWARD = "fwd";
+    private static final String PLAYNPAUSE = "play";
+
     @BindView(R.id.imageViewVolInc)
     ImageView imageViewVolInc;
     @BindView(R.id.imageViewVolDec)
@@ -129,18 +134,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ButterKnife.bind(this);
         imageViewVolInc.setOnClickListener(this);
+        imageViewVolInc.setOnLongClickListener(this);
         imageViewVolDec.setOnClickListener(this);
+        imageViewVolDec.setOnLongClickListener(this);
         imageViewPrgmDec.setOnClickListener(this);
+        imageViewPrgmDec.setOnLongClickListener(this);
         imageViewPrgmUp.setOnClickListener(this);
+        imageViewPrgmUp.setOnLongClickListener(this);
         imageViewMute.setOnClickListener(this);
         imageViewBlue.setOnClickListener(this);
         imageViewRed.setOnClickListener(this);
         imageViewGreen.setOnClickListener(this);
         imageViewYellow.setOnClickListener(this);
         imageViewDown.setOnClickListener(this);
+        imageViewDown.setOnLongClickListener(this);
         imageViewUp.setOnClickListener(this);
-        imageViewRight.setOnClickListener(this);
-        imageViewLeft.setOnClickListener(this);
+        imageViewUp.setOnLongClickListener(this);
+        imageViewRight.setOnLongClickListener(this);
+        imageViewLeft.setOnLongClickListener(this);
         imageViewNine.setOnClickListener(this);
         imageViewEight.setOnClickListener(this);
         imageViewSeven.setOnClickListener(this);
@@ -154,7 +165,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageViewOk.setOnClickListener(this);
         imageViewHome.setOnClickListener(this);
         imageViewReward.setOnClickListener(this);
+        imageViewReward.setOnLongClickListener(this);
         imageViewForward.setOnClickListener(this);
+        imageViewForward.setOnLongClickListener(this);
         imageViewPause.setOnClickListener(this);
         imageViewPlay.setOnClickListener(this);
         imageViewRecord.setOnClickListener(this);
@@ -173,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         int id = v.getId();
         String u;
-        switch (id){
+        switch (id) {
             case R.id.imageViewVolInc:
                 u = URL_FREE + VOLUME_UP;
                 break;
@@ -251,10 +264,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.imageViewGreen:
                 u = URL_FREE + GREEN;
+                break;
+            case R.id.imageViewForward:
+                u = URL_FREE + FORWARD;
+                break;
+            case R.id.imageViewReward:
+                u = URL_FREE + BACKWARD;
+                break;
+            case R.id.imageViewRecord:
+                u = URL_FREE + RECORD;
+                break;
+            case R.id.imageViewPause:
+                u = URL_FREE + PLAYNPAUSE;
+                break;
+            case R.id.imageViewPlay:
+                u = URL_FREE + PLAYNPAUSE;
+                break;
             default:
                 u = null;
         }
-        if(u!=null) {
+        if (u != null) {
             new OkHttpHandler().execute(u);
         }
     }
@@ -270,6 +299,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public boolean onLongClick(View v) {
+        int id = v.getId();
+        String u;
+        switch (id) {
+            case R.id.imageViewVolInc:
+                u = URL_FREE + VOLUME_UP + "&long=true";
+                break;
+            case R.id.imageViewVolDec:
+                u = URL_FREE + VOLUME_DOWN + "&long=true";
+                break;
+            case R.id.imageViewPrgmDec:
+                u = URL_FREE + CHANNEL_DOWN + "&long=true";
+                break;
+            case R.id.imageViewPrgmUp:
+                u = URL_FREE + CHANNEL_UP + "&long=true";
+                break;
+            case R.id.imageViewUp:
+                u = URL_FREE + UP + "&long=true";
+                break;
+            case R.id.imageViewDown:
+                u = URL_FREE + DOWN + "&long=true";
+                break;
+            case R.id.imageViewLeft:
+                u = URL_FREE + LEFT + "&long=true";
+                break;
+            case R.id.imageViewRight:
+                u = URL_FREE + RIGHT + "&long=true";
+                break;
+
+            case R.id.imageViewForward:
+                u = URL_FREE + FORWARD + "&long=true";
+                break;
+            case R.id.imageViewReward:
+                u = URL_FREE + BACKWARD + "&long=true";
+                break;
+
+            default:
+                u = null;
+        }
+        if (u != null) {
+            new OkHttpHandler().execute(u);
+        }
+        return true;
+    }
+
 
     private class OkHttpHandler extends AsyncTask<String, Void, Void> {
 
