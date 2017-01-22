@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Freebox" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="FreeboxTheme" parent="android:Theme.Material.NoActionBar" >
+        <item name="colorPrimary">@color/background_freebox</item>
+    </style>
+</resources>

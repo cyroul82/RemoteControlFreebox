@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="FreeboxTheme" parent="Theme.AppCompat.Light" >
+        <item name="android:colorBackground">@color/background_freebox</item>
+        <item name="colorPrimary">@color/background_freebox</item>
+    </style>
+
+</resources>
