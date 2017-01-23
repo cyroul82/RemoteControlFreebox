@@ -1,21 +1,22 @@
 package co.shortbrain.remotecontrolfreebox;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,7 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String BACKWARD = "bwd";
     private static final String FORWARD = "fwd";
     private static final String PLAYNPAUSE = "play";
-
+    final String CODE_PARAM = "code";
+    final String KEY_PARAM = "key";
+    final String LONG_PRESS_PARAM = "long";
+    private final String FREE_BASE_URL = "http://hd1.freebox.fr/pub/remote_control?";
     @BindView(R.id.imageViewVolInc)
     ImageView imageViewVolInc;
     @BindView(R.id.imageViewVolDec)
@@ -120,8 +124,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.imageViewRecord)
     ImageView imageViewRecord;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private String URL_FREE = "http://hd1.freebox.fr/pub/remote_control?code=67277440&key=";
+    //"http://hd1.freebox.fr/pub/remote_control?code=67277440&key="
     private OkHttpClient client = new OkHttpClient();
+    private String mCode;
 
 
     @Override
@@ -150,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageViewDown.setOnLongClickListener(this);
         imageViewUp.setOnClickListener(this);
         imageViewUp.setOnLongClickListener(this);
+        imageViewRight.setOnClickListener(this);
         imageViewRight.setOnLongClickListener(this);
+        imageViewLeft.setOnClickListener(this);
         imageViewLeft.setOnLongClickListener(this);
         imageViewNine.setOnClickListener(this);
         imageViewEight.setOnClickListener(this);
@@ -173,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageViewRecord.setOnClickListener(this);
         imageViewPower.setOnClickListener(this);
 
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+
+
         Bundle bundle = new Bundle();
         bundle.putString("app_open", "app_open");
 
@@ -180,112 +190,143 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
 
+
+    }
+
+    private boolean isCodeSetUp() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String code = sharedPrefs.getString(SettingsActivity.KEY_CODE_REMOTE, null);
+        if (code.equals(getString(R.string.pref_default_code_remote)) || code == null) {
+            Toast.makeText(this, "Please enter you remote code in the settings !", Toast.LENGTH_LONG).show();
+            return false;
+        } else {
+            mCode = code;
+            return true;
+        }
+    }
+
+    private void codeNotValid() {
+
     }
 
     @Override
     public void onClick(View v) {
-        int id = v.getId();
-        String u;
-        switch (id) {
-            case R.id.imageViewVolInc:
-                u = URL_FREE + VOLUME_UP;
-                break;
-            case R.id.imageViewVolDec:
-                u = URL_FREE + VOLUME_DOWN;
-                break;
-            case R.id.imageViewPrgmDec:
-                u = URL_FREE + CHANNEL_DOWN;
-                break;
-            case R.id.imageViewPrgmUp:
-                u = URL_FREE + CHANNEL_UP;
-                break;
-            case R.id.imageViewHome:
-                u = URL_FREE + HOME;
-                break;
-            case R.id.imageViewRed:
-                u = URL_FREE + RED;
-                break;
-            case R.id.imageViewYellow:
-                u = URL_FREE + YELLOW;
-                break;
-            case R.id.imageViewZero:
-                u = URL_FREE + NUMBER_0;
-                break;
-            case R.id.imageViewOne:
-                u = URL_FREE + NUMBER_1;
-                break;
-            case R.id.imageViewTwo:
-                u = URL_FREE + NUMBER_2;
-                break;
-            case R.id.imageViewThree:
-                u = URL_FREE + NUMBER_3;
-                break;
-            case R.id.imageViewFour:
-                u = URL_FREE + NUMBER_4;
-                break;
-            case R.id.imageViewFive:
-                u = URL_FREE + NUMBER_5;
-                break;
-            case R.id.imageViewSix:
-                u = URL_FREE + NUMBER_6;
-                break;
-            case R.id.imageViewSeven:
-                u = URL_FREE + NUMBER_7;
-                break;
-            case R.id.imageViewEight:
-                u = URL_FREE + NUMBER_8;
-                break;
-            case R.id.imageViewNine:
-                u = URL_FREE + NUMBER_9;
-                break;
-            case R.id.imageViewUp:
-                u = URL_FREE + UP;
-                break;
-            case R.id.imageViewDown:
-                u = URL_FREE + DOWN;
-                break;
-            case R.id.imageViewLeft:
-                u = URL_FREE + LEFT;
-                break;
-            case R.id.imageViewRight:
-                u = URL_FREE + RIGHT;
-                break;
-            case R.id.imageViewPower:
-                u = URL_FREE + POWER;
-                break;
-            case R.id.imageViewOk:
-                u = URL_FREE + OK;
-                break;
-            case R.id.imageViewMute:
-                u = URL_FREE + MUTE;
-                break;
-            case R.id.imageViewBlue:
-                u = URL_FREE + BLUE;
-                break;
-            case R.id.imageViewGreen:
-                u = URL_FREE + GREEN;
-                break;
-            case R.id.imageViewForward:
-                u = URL_FREE + FORWARD;
-                break;
-            case R.id.imageViewReward:
-                u = URL_FREE + BACKWARD;
-                break;
-            case R.id.imageViewRecord:
-                u = URL_FREE + RECORD;
-                break;
-            case R.id.imageViewPause:
-                u = URL_FREE + PLAYNPAUSE;
-                break;
-            case R.id.imageViewPlay:
-                u = URL_FREE + PLAYNPAUSE;
-                break;
-            default:
-                u = null;
+        if (isCodeSetUp()) {
+            int id = v.getId();
+            String key;
+            switch (id) {
+                case R.id.imageViewVolInc:
+                    key = VOLUME_UP;
+                    break;
+                case R.id.imageViewVolDec:
+                    key = VOLUME_DOWN;
+                    break;
+                case R.id.imageViewPrgmDec:
+                    key = CHANNEL_DOWN;
+                    break;
+                case R.id.imageViewPrgmUp:
+                    key = CHANNEL_UP;
+                    break;
+                case R.id.imageViewHome:
+                    key = HOME;
+                    break;
+                case R.id.imageViewRed:
+                    key = RED;
+                    break;
+                case R.id.imageViewYellow:
+                    key = YELLOW;
+                    break;
+                case R.id.imageViewZero:
+                    key = NUMBER_0;
+                    break;
+                case R.id.imageViewOne:
+                    key = NUMBER_1;
+                    break;
+                case R.id.imageViewTwo:
+                    key = NUMBER_2;
+                    break;
+                case R.id.imageViewThree:
+                    key = NUMBER_3;
+                    break;
+                case R.id.imageViewFour:
+                    key = NUMBER_4;
+                    break;
+                case R.id.imageViewFive:
+                    key = NUMBER_5;
+                    break;
+                case R.id.imageViewSix:
+                    key = NUMBER_6;
+                    break;
+                case R.id.imageViewSeven:
+                    key = NUMBER_7;
+                    break;
+                case R.id.imageViewEight:
+                    key = NUMBER_8;
+                    break;
+                case R.id.imageViewNine:
+                    key = NUMBER_9;
+                    break;
+                case R.id.imageViewUp:
+                    key = UP;
+                    break;
+                case R.id.imageViewDown:
+                    key = DOWN;
+                    break;
+                case R.id.imageViewLeft:
+                    key = LEFT;
+                    break;
+                case R.id.imageViewRight:
+                    key = RIGHT;
+                    break;
+                case R.id.imageViewPower:
+                    key = POWER;
+                    break;
+                case R.id.imageViewOk:
+                    key = OK;
+                    break;
+                case R.id.imageViewMute:
+                    key = MUTE;
+                    break;
+                case R.id.imageViewBlue:
+                    key = BLUE;
+                    break;
+                case R.id.imageViewGreen:
+                    key = GREEN;
+                    break;
+                case R.id.imageViewForward:
+                    key = FORWARD;
+                    break;
+                case R.id.imageViewReward:
+                    key = BACKWARD;
+                    break;
+                case R.id.imageViewRecord:
+                    key = RECORD;
+                    break;
+                case R.id.imageViewPause:
+                    key = PLAYNPAUSE;
+                    break;
+                case R.id.imageViewPlay:
+                    key = PLAYNPAUSE;
+                    break;
+                default:
+                    key = null;
+                    break;
+            }
+            if (key != null) {
+
+                Uri builtUri = Uri.parse(FREE_BASE_URL)
+                        .buildUpon()
+                        .appendQueryParameter(CODE_PARAM, mCode)
+                        .appendQueryParameter(KEY_PARAM, key)
+                        //.appendQueryParameter(UNITS_PARAM, "metric")
+                        .build();
+
+                OkHttpHandler handler = new OkHttpHandler();
+                handler.execute(builtUri.toString());
+
+            }
         }
-        if (u != null) {
-            new OkHttpHandler().execute(u);
-        }
+
     }
 
     @Override
@@ -297,76 +338,81 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @Override
     public boolean onLongClick(View v) {
-        int id = v.getId();
-        String u;
-        switch (id) {
-            case R.id.imageViewVolInc:
-                u = URL_FREE + VOLUME_UP + "&long=true";
-                break;
-            case R.id.imageViewVolDec:
-                u = URL_FREE + VOLUME_DOWN + "&long=true";
-                break;
-            case R.id.imageViewPrgmDec:
-                u = URL_FREE + CHANNEL_DOWN + "&long=true";
-                break;
-            case R.id.imageViewPrgmUp:
-                u = URL_FREE + CHANNEL_UP + "&long=true";
-                break;
-            case R.id.imageViewUp:
-                u = URL_FREE + UP + "&long=true";
-                break;
-            case R.id.imageViewDown:
-                u = URL_FREE + DOWN + "&long=true";
-                break;
-            case R.id.imageViewLeft:
-                u = URL_FREE + LEFT + "&long=true";
-                break;
-            case R.id.imageViewRight:
-                u = URL_FREE + RIGHT + "&long=true";
-                break;
+        if (isCodeSetUp()) {
+            int id = v.getId();
+            String key;
+            switch (id) {
+                case R.id.imageViewVolInc:
+                    key = VOLUME_UP;
+                    break;
+                case R.id.imageViewVolDec:
+                    key = VOLUME_DOWN;
+                    break;
+                case R.id.imageViewPrgmDec:
+                    key = CHANNEL_DOWN;
+                    break;
+                case R.id.imageViewPrgmUp:
+                    key = CHANNEL_UP;
+                    break;
+                case R.id.imageViewUp:
+                    key = UP;
+                    break;
+                case R.id.imageViewDown:
+                    key = DOWN;
+                    break;
+                case R.id.imageViewLeft:
+                    key = LEFT;
+                    break;
+                case R.id.imageViewRight:
+                    key = RIGHT;
+                    break;
 
-            case R.id.imageViewForward:
-                u = URL_FREE + FORWARD + "&long=true";
-                break;
-            case R.id.imageViewReward:
-                u = URL_FREE + BACKWARD + "&long=true";
-                break;
+                case R.id.imageViewForward:
+                    key = FORWARD;
+                    break;
+                case R.id.imageViewReward:
+                    key = BACKWARD;
+                    break;
 
-            default:
-                u = null;
-        }
-        if (u != null) {
-            new OkHttpHandler().execute(u);
+                default:
+                    key = null;
+                    break;
+            }
+            if (key != null) {
+                Uri builtUri = Uri.parse(FREE_BASE_URL)
+                        .buildUpon()
+                        .appendQueryParameter(CODE_PARAM, mCode)
+                        .appendQueryParameter(KEY_PARAM, key)
+                        .appendQueryParameter(LONG_PRESS_PARAM, "true")
+                        .build();
+
+                OkHttpHandler handler = new OkHttpHandler();
+                handler.execute(builtUri.toString());
+            }
+
         }
         return true;
     }
 
 
-    private class OkHttpHandler extends AsyncTask<String, Void, Void> {
+    private class OkHttpHandler extends AsyncTask<String, Void, String> {
 
         @Override
-        protected Void doInBackground(String... params) {
-
-            try {
-                URL url = new URL(params[0]);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        protected String doInBackground(String... params) {
 
             Request request = new Request.Builder()
                     .url(params[0])
@@ -374,11 +420,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             try {
                 Response response = client.newCall(request).execute();
-                response.close();
+                return response.body().string();
             } catch (IOException io) {
-                Log.e(LOG_TAG, "Run executed in Volume Down " + io.getMessage());
+                Log.d(LOG_TAG, "IOException OkHttpHandler : " + io.getMessage());
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (!s.equals("")) {
+                Toast.makeText(getApplicationContext(), "Please check the code of your remote control !", Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 
