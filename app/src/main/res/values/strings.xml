@@ -1,14 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Freebox V6 Remote Control</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="app_name">Freebox V6 Remote Control</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
     <string name="pref_title_code_remote">Code Remote Control</string>
-    <string name="pref_default_code_remote">0000000</string>
+    <string name="pref_default_code_remote" translatable="false">0000000</string>
 
 
     <string name="action_settings">Settings</string>

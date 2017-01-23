@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Télécommande Free V6</string>
+    <string name="pref_header_general">Général</string>
+
+    <string name="pref_title_code_remote">Code Télécommande</string>
+
+    <string name="action_settings">Paramètres</string>
+    <string name="error_code">Merci de vérifier votre code de la télécommande avec votre Freebox Player !</string>
+</resources>
