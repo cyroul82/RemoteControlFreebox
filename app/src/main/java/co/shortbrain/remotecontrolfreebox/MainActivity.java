@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (!s.equals("")) {
-                Toast.makeText(getApplicationContext(), "Please check the code of your remote control !", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.error_code), Toast.LENGTH_LONG).show();
             }
 
         }
